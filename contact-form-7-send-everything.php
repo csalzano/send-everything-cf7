@@ -7,7 +7,7 @@ defined( 'ABSPATH' ) or exit;
  * Description: Adds a mail-tag <code>[everything]</code> that sends all fields in the message body
  * Author: Corey Salzano
  * Author URI: https://breakfastco.xyz
- * Version: 1.0.0
+ * Version: 1.0.1
  * Text Domain: cf7-send-everything
  * Domain Path: languages
  * License: GPLv2 or later
@@ -51,17 +51,25 @@ class Contact_Form_7_Send_All_Fields
 	
 		//Allow HTML in emails
 		add_filter( 'wp_mail_content_type', array( $this, 'html_mail_content_type' ) );
-	
-		foreach ( $_POST as $k => $v ) {
-			if ( substr( $k, 0, 6 ) == '_wpcf7' || strpos( $k, 'all-fields' ) || $k === '_wpnonce' ) {
-				unset( $_POST["{$k}"] );
+
+		//We are going to edit the array, so make a copy of $_POST
+		$post_data = $_POST;
+		//Discard some fields
+		foreach ( $post_data as $k => $v ) {
+			if ( ( 6 <= strlen( $k ) && substr( $k, 0, 6 ) == '_wpcf7' )
+				|| $k === '_wpnonce'
+				|| $k === '_wp_http_referer'
+				|| $k === 'h-captcha-response'
+				|| $k === 'g-recaptcha-response' )
+			{
+				unset( $post_data["{$k}"] );
 			}
 		}
 
 		$postbody = apply_filters( 'wpcf7_send_all_fields_format_before', '<h1 style="font-family:Helvetica,sans-serif;">Submitted Values</h1><table style="font-family:Helvetica,sans-serif;border:2px solid #f8f8f8;border-collapse:collapse;background:#fff;">' );
 
 		//Add some meta data to the end of the submitted form data
-		foreach ( $_POST as $k => $v ) {
+		foreach ( $post_data as $k => $v ) {
 	
 			// Remove dupe content. The Hidden and Values are both sent.
 			if ( preg_match( '/hidden\-/', $k ) ) {
