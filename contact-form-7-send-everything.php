@@ -66,7 +66,19 @@ class Contact_Form_7_Send_All_Fields
 			}
 		}
 
-		$postbody = apply_filters( 'wpcf7_send_all_fields_format_before', '<h1 style="font-family:Helvetica,sans-serif;">Submitted Values</h1><table style="font-family:Helvetica,sans-serif;border:2px solid #f8f8f8;border-collapse:collapse;background:#fff;">' );
+		$css_font = apply_filters( 'wpcf7_send_everything_css_font', 'font-family:Helvetica,sans-serif;' );
+
+		//Start building the email body HTML in $postbody
+		$postbody = apply_filters(
+			'wpcf7_send_everything_title',
+			"<h1 style='{$css_font}'>" . __( 'Submitted Values', 'cf7-send-everything' ) . "</h1>"
+		);
+
+		$table_open_html = apply_filters(
+			'wpcf7_send_everything_table_open',
+			"<table style='{$css_font}border:2px solid #f8f8f8;border-collapse:collapse;background:#fff;'>"
+		);
+		$postbody .= $table_open_html;
 
 		//Add some meta data to the end of the submitted form data
 		foreach ( $post_data as $k => $v ) {
@@ -77,15 +89,22 @@ class Contact_Form_7_Send_All_Fields
 			}
 	
 			// If there's no value for the field, don't send it.
-			if ( empty( $v ) && false === apply_filters( 'wpcf7_send_all_fields_send_empty_fields', false ) ) {
+			if ( empty( $v ) && false === apply_filters( 'wpcf7_send_everything_empty_fields', true ) ) {
 				continue;
 			}
 
 			$postbody .= $this->prepare_table_row_value( $k, $v );
 		}
 
-		$postbody .= apply_filters( 'wpcf7_send_all_fields_format_after', '</table><h2 style="font-family:Helvetica,sans-serif;">Submission Meta</h2><table style="font-family:Helvetica,sans-serif;border:2px solid #f8f8f8;border-collapse:collapse;background:#fff;">', 'html' );	
-		
+		$postbody .= apply_filters( 'wpcf7_send_everything_table_close', '</table>' );
+
+		$postbody .= apply_filters(
+			'wpcf7_send_everything_title_meta',
+			"<h2 style='{$css_font}'>" . __( 'Submission Meta', 'cf7-send-everything' ) . "</h2>"
+		);
+
+		$postbody .= $table_open_html;
+
 		//Add some meta data
 		$submission = WPCF7_Submission::get_instance();
 		if( is_callable( array( $submission, 'get_contact_form' ) ) ) {
@@ -99,7 +118,7 @@ class Contact_Form_7_Send_All_Fields
 				$postbody .= $this->prepare_table_row_value( 'form_id', $form->id() );
 			}
 		}
-		
+
 		if ( is_callable( array( $submission, 'get_meta' ) ) )
 		{
 			//Form URL
@@ -123,8 +142,8 @@ class Contact_Form_7_Send_All_Fields
 			}
 		}		
 
-		$postbody .= apply_filters( 'wpcf7_send_all_fields_format_after', '</table>', 'html' );		
-	
+		$postbody .= apply_filters( 'wpcf7_send_everything_table_close', '</table>' );
+
 		$components['body'] = str_replace( '<p>[' . self::MAIL_TAG . ']</p>', $postbody, str_replace( '[' . self::MAIL_TAG . ']', $postbody, $components['body'] ) );
 
 		return $components;
@@ -137,19 +156,33 @@ class Contact_Form_7_Send_All_Fields
 		}
 
 		// Make the labels easier to read. Thanks, @hitolonen
-		$label = apply_filters( 'wpcf7_send_all_fields_format_key', true ) ? ucwords( str_replace( "-", " ", str_replace( "_", " ", $label ) ) ) : $label;
+		$label = true === apply_filters( 'wpcf7_send_everything_format_labels', true, $label, $value ) ? ucwords( str_replace( "-", " ", str_replace( "_", " ", $label ) ) ) : $label;
+		
+		$label = apply_filters( 'wpcf7_send_everything_label', $label, $value );
 
 		// Sanitize!
 		$label = esc_html( $label );
 		$value = esc_html( $value );
 
 		//Link values that are URLs
-		if( filter_var( $value, FILTER_VALIDATE_URL ) )
+		if( true === apply_filters( 'wpcf7_send_everything_link_urls', true, $label, $value )
+			&& filter_var( $value, FILTER_VALIDATE_URL ) )
 		{
 			$value = sprintf( '<a href="%1$s">%1$s</a>', $value );
 		}
 
-		return apply_filters( 'wpcf7_send_all_fields_format_item', "<tr><td style='padding:.75em .75em .5em;border:2px solid #f8f8f8;font-size:1.2em;'><font size='3'>{$label}</font></td><td style='padding:.75em .75em .5em;border:2px solid #f8f8f8;'><strong style='font-weight:bold;'>{$value}</strong></td></tr>", $label, $value, 'html' );
+		$css_table_cell = 'padding:.75em .75em .5em;border:2px solid #f8f8f8;';
+
+		return apply_filters(
+			'wpcf7_send_everything_table_row',
+			"<tr><td style='{$css_table_cell}font-size:1.2em;'>"
+				. "<font size='3'>{$label}</font></td>"
+				. "<td style='{$css_table_cell}'>"
+				. "<strong style='font-weight:bold;'>{$value}</strong></td></tr>",
+			$label,
+			$value,
+			$css_table_cell
+		);
 	}
 }
 $cf7_send_all_fields = new Contact_Form_7_Send_All_Fields();
