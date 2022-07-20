@@ -5,9 +5,9 @@ defined( 'ABSPATH' ) or exit;
  * Plugin Name: Contact Form 7 - Send Everything
  * Plugin URI: https://breakfastco.xyz
  * Description: Adds a mail-tag <code>[everything]</code> that sends all fields in the message body
- * Author: Corey Salzano
- * Author URI: https://breakfastco.xyz
- * Version: 1.0.1
+ * Author: Breakfast Co
+ * Author URI: https://github.com/csalzano
+ * Version: 1.1.0
  * Text Domain: cf7-send-everything
  * Domain Path: languages
  * License: GPLv2 or later
