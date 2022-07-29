@@ -7,6 +7,7 @@ WordPress plugin. Extension for Contact Form 7. Adds a mail-tag <code>[everythin
 ## Filter Hooks
 
 * `wpcf7_send_everything_empty_fields` Exclude empty fields, boolean
+* `wpcf7_send_everything_ignored_form_tags` Exclude form tags of any type, array
 * `wpcf7_send_everything_title` Change the title at the top of the email body, string
 * `wpcf7_send_everything_title_meta` Change the title of the second metadata table, string
 * `wpcf7_send_everything_css_font` Change the font-family, string

@@ -80,7 +80,12 @@ class Contact_Form_7_Send_All_Fields
 		);
 		$postbody .= $table_open_html;
 
-		//Add some meta data to the end of the submitted form data
+		$ignored_form_tags = apply_filters( 'wpcf7_send_everything_ignored_form_tags', array(
+			'honeypot', //Honeypot for Contact Form 7 by Nocean
+		) );
+
+		//Add the fields
+		$submission = WPCF7_Submission::get_instance();
 		foreach ( $post_data as $k => $v ) {
 	
 			// Remove dupe content. The Hidden and Values are both sent.
@@ -90,6 +95,11 @@ class Contact_Form_7_Send_All_Fields
 	
 			// If there's no value for the field, don't send it.
 			if ( empty( $v ) && false === apply_filters( 'wpcf7_send_everything_empty_fields', true ) ) {
+				continue;
+			}
+
+			//Is this an ignored form-tag type?
+			if ( in_array( $this->get_form_tag( $submission, $k ), $ignored_form_tags ) ) {
 				continue;
 			}
 
@@ -106,7 +116,6 @@ class Contact_Form_7_Send_All_Fields
 		$postbody .= $table_open_html;
 
 		//Add some meta data
-		$submission = WPCF7_Submission::get_instance();
 		if( is_callable( array( $submission, 'get_contact_form' ) ) ) {
 			$form = $submission->get_contact_form();
 			//Form title
@@ -147,6 +156,23 @@ class Contact_Form_7_Send_All_Fields
 		$components['body'] = str_replace( '<p>[' . self::MAIL_TAG . ']</p>', $postbody, str_replace( '[' . self::MAIL_TAG . ']', $postbody, $components['body'] ) );
 
 		return $components;
+	}
+
+	protected function get_form_tag( $submission, $tag )
+	{
+		if( is_callable( array( $submission, 'get_contact_form' ) )
+			&& is_callable( array( $submission->get_contact_form(), 'scan_form_tags' ) ) )
+		{
+			foreach( $submission->get_contact_form()->scan_form_tags() as $form_tag )
+			{
+				if( $form_tag->name != $tag )
+				{
+					continue;
+				}
+				return $form_tag->basetype ?? '';
+			}
+		}
+		return '';
 	}
 
 	protected function prepare_table_row_value( $label, $value )
