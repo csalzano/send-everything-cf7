@@ -7,7 +7,7 @@ defined( 'ABSPATH' ) or exit;
  * Description: Adds a mail-tag <code>[everything]</code> that sends all fields in the message body
  * Author: Breakfast Co
  * Author URI: https://github.com/csalzano
- * Version: 1.1.0
+ * Version: 1.2.0
  * Text Domain: cf7-send-everything
  * Domain Path: languages
  * License: GPLv2 or later
