@@ -4,7 +4,12 @@
 
 WordPress plugin. Extension for Contact Form 7. Adds a mail-tag <code>[everything]</code> that sends all fields in the message body.
 
-## Filter Hooks
+## FEATURES
+
+- `[everything]` mail tag for great looking, send-everything emails
+- Adds a `[submit]` button to any form missing one
+
+### Filter Hooks
 
 * `wpcf7_send_everything_empty_fields` Exclude empty fields, boolean
 * `wpcf7_send_everything_ignored_form_tags` Exclude form tags of any type, array

@@ -22,10 +22,47 @@ class Contact_Form_7_Send_All_Fields
 	{
 		add_filter( 'wpcf7_mail_components', array( $this, 'edit_mail_components' ) );
 		add_filter( 'wpcf7_collect_mail_tags', array( $this, 'add_tag' ) );
+		add_filter( 'wpcf7_contact_form_properties', array( $this, 'add_submit_button' ), 10, 2 );
+	}
+
+	/**
+	 * add_submit_button
+	 *
+	 * Adds [submit] form tags to forms that do not have them.
+	 *
+	 * @param  array $properties
+	 * @param  WPCF7_ContactForm $form
+	 * @return array
+	 */
+	public function add_submit_button( $properties, $form )
+	{
+		if( is_admin()
+			|| ! isset( $properties['form'] )
+			|| ! is_string( $properties['form'] ) )
+		{
+			return $properties;
+		}
+
+		//Should we even do this?
+		if( false === apply_filters( 'wpcf7_send_everything_add_submit_buttons', true, $properties, $form ) )
+		{
+			return $properties;
+		}
+
+		//Does the form have a [submit] form tag?
+		$pattern = '/\[submit[^\]]*\]/';
+		if( 1 !== preg_match( $pattern, $properties['form'] ) )
+		{
+			//No, add one
+			$properties['form'] .= apply_filters( 'wpcf7_send_everything_submit_button', "\n\n[submit]", $properties, $form );
+		}
+		return $properties;
 	}
 
 	/**
 	 * add_tag
+	 *
+	 * Adds an [everything] mail tag.
 	 *
 	 * @param  array $mailtags
 	 * @return array
@@ -33,18 +70,6 @@ class Contact_Form_7_Send_All_Fields
 	public function add_tag( $mailtags = array() ) {
 		$mailtags[] = self::MAIL_TAG;
 		return $mailtags;
-	}
-	
-	/**
-	 * html_mail_content_type
-	 * 
-	 * Returns the string 'text/html'
-	 *
-	 * @param  string $type
-	 * @return string
-	 */
-	public static function html_mail_content_type( $type ) {
-		return 'text/html';
 	}
 
 	public function edit_mail_components($components) {
@@ -173,6 +198,18 @@ class Contact_Form_7_Send_All_Fields
 			}
 		}
 		return '';
+	}
+
+	/**
+	 * html_mail_content_type
+	 * 
+	 * Returns the string 'text/html'
+	 *
+	 * @param  string $type
+	 * @return string
+	 */
+	public static function html_mail_content_type( $type ) {
+		return 'text/html';
 	}
 
 	protected function prepare_table_row_value( $label, $value )
