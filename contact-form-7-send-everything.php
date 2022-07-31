@@ -178,7 +178,15 @@ class Contact_Form_7_Send_All_Fields
 
 		$postbody .= apply_filters( 'wpcf7_send_everything_table_close', '</table>' );
 
-		$components['body'] = str_replace( '<p>[' . self::MAIL_TAG . ']</p>', $postbody, str_replace( '[' . self::MAIL_TAG . ']', $postbody, $components['body'] ) );
+		//Is the message body empty?
+		if( '' == $components['body']
+			&& true === apply_filters( 'wpcf7_send_everything_fill_empty_message_body', true ) )
+		{
+			//Prevent a blank mail template from sending empty emails
+			$components['body'] = '[everything]';
+		}
+
+		$components['body'] = str_replace( '[' . self::MAIL_TAG . ']', $postbody, str_replace( '<p>[' . self::MAIL_TAG . ']</p>', $postbody, $components['body'] ) );
 
 		return $components;
 	}
