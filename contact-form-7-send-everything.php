@@ -7,7 +7,7 @@ defined( 'ABSPATH' ) or exit;
  * Description: Adds a mail-tag <code>[everything]</code> that sends all fields in the message body
  * Author: Breakfast Co
  * Author URI: https://github.com/csalzano
- * Version: 1.2.0
+ * Version: 1.0.0
  * Text Domain: cf7-send-everything
  * Domain Path: languages
  * License: GPLv2 or later
@@ -44,7 +44,7 @@ class Contact_Form_7_Send_All_Fields
 		}
 
 		//Should we even do this?
-		if( false === apply_filters( 'wpcf7_send_everything_add_submit_buttons', true, $properties, $form ) )
+		if( false === apply_filters( 'wpcf7_send_everything_submit_button_add', true, $properties, $form ) )
 		{
 			return $properties;
 		}

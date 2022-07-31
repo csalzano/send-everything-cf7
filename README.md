@@ -25,3 +25,5 @@ WordPress plugin. Extension for Contact Form 7. Adds a mail-tag <code>[everythin
 * `wpcf7_send_everything_format_labels` Disable title-case field labels, boolean
 * `wpcf7_send_everything_label` Change field label text, string
 * `wpcf7_send_everything_link_urls` Disable linked URLs, boolean
+* `wpcf7_send_everything_submit_button_add` Disable adding submit buttons to forms missing them, boolean
+* `wpcf7_send_everything_submit_button` Change the submit button that is added to forms missing them, string
