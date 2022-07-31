@@ -7,6 +7,9 @@ WordPress plugin. Extension for Contact Form 7. Adds a mail-tag <code>[everythin
 ## FEATURES
 
 - `[everything]` mail tag for great looking, send-everything emails
+ - Includes all fields in emails except CAPTCHA and spam honeypot fields
+ - Formats values and submission meta into tables
+ - Added automatically to forms with blank "Message body" fields
 - Adds a `[submit]` button to any form missing one
 
 ### Filter Hooks
