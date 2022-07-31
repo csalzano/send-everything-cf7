@@ -1,4 +1,4 @@
-=== Contact Form 7 - Send Everything ===
+=== Send Everything for Contact Form 7 ===
 
 Contributors:      salzano
 Tested up to:      6.0.1

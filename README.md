@@ -1,12 +1,12 @@
-![Contact Form 7 - Send Everything](assets/banner-1544x500.jpg)
+![Send Everything for Contact Form 7](assets/banner-1544x500.jpg)
 
-# contact-form-7-send-everything
+# send-everything-cf7
 
 WordPress plugin. Extension for Contact Form 7. Adds a mail-tag <code>[everything]</code> that sends all fields in the message body.
 
 ## FEATURES
 
-- `[everything]` mail tag for great looking, send-everything emails
+- Adds `[everything]` mail tag for great looking, send-everything emails
  - Includes all fields in emails except CAPTCHA and spam honeypot fields
  - Formats values and submission meta into tables
  - Added automatically to forms with blank "Message body" fields
