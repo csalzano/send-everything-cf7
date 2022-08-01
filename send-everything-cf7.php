@@ -7,7 +7,7 @@ defined( 'ABSPATH' ) or exit;
  * Description: Adds a mail-tag <code>[everything]</code> that sends all fields in the message body
  * Author: Breakfast Co
  * Author URI: https://github.com/csalzano
- * Version: 1.0.1
+ * Version: 1.1.0
  * Text Domain: send-everything-cf7
  * Domain Path: languages
  * License: GPLv2 or later
@@ -25,6 +25,7 @@ if( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) )
 			add_filter( 'wpcf7_mail_components', array( $this, 'edit_mail_components' ) );
 			add_filter( 'wpcf7_collect_mail_tags', array( $this, 'add_tag' ) );
 			add_filter( 'wpcf7_contact_form_properties', array( $this, 'add_submit_button' ), 10, 2 );
+			add_filter( 'wpcf7_contact_form_default_pack', array( $this, 'change_default_mail_templates' ), 10, 2 );
 		}
 
 		/**
@@ -72,6 +73,28 @@ if( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) )
 		public function add_tag( $mailtags = array() ) {
 			$mailtags[] = self::MAIL_TAG;
 			return $mailtags;
+		}
+
+		/**
+		 * change_default_mail_templates
+		 *
+		 * @param  WPCF7_ContactForm $contact_form
+		 * @param  array $args
+		 * @return WPCF7_ContactForm
+		 */
+		public function change_default_mail_templates( $contact_form, $args )
+		{
+			$properties = $contact_form->get_properties();
+			if( $properties['mail'] == WPCF7_ContactFormTemplate::mail() )
+			{
+				$properties['mail']['body'] = '[' . self::MAIL_TAG . ']';
+			}
+			if( $properties['mail_2'] == WPCF7_ContactFormTemplate::mail_2() )
+			{
+				$properties['mail_2']['body'] = '[' . self::MAIL_TAG . ']';
+			}
+			$contact_form->set_properties( $properties );
+			return $contact_form;
 		}
 
 		public function edit_mail_components($components) {
