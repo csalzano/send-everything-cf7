@@ -13,6 +13,12 @@ WordPress plugin. Extension for Contact Form 7. Adds a mail-tag <code>[everythin
 - Populates mail tab message body with `[everything]` during Add New form
 - Adds a `[submit]` button to any form missing one
 
+### Screenshot
+
+This screenshot shows two emails sent by Contact Form 7. The first, labeled "Before," uses common mail template code in the message body. The second, labeled "After," uses the `[everything]` mail tag in the message body.
+
+![Before and after screenshots of emails sent by Contact Form 7](assets/screenshot-1.png)
+
 ### Filter Hooks
 
 * `wpcf7_send_everything_empty_fields` Exclude empty fields, boolean
