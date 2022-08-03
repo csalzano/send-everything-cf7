@@ -258,7 +258,7 @@ if( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) )
 
 			// Sanitize!
 			$label = esc_html( $label );
-			$value = esc_html( $value );
+			$value = esc_html( stripslashes( $value ) );
 
 			//Link values that are URLs
 			if( true === apply_filters( 'wpcf7_send_everything_link_urls', true, $label, $value )
