@@ -3,10 +3,10 @@ defined( 'ABSPATH' ) or exit;
 
 /**
  * Plugin Name: Send Everything for Contact Form 7
- * Plugin URI: https://breakfastco.xyz
+ * Plugin URI: https://github.com/csalzano/send-everything-cf7
  * Description: Provides [everything] mail tag for great-looking, send-everything emails 
  * Author: Breakfast Co
- * Author URI: https://github.com/csalzano
+ * Author URI: https://breakfastco.xyz
  * Version: 1.1.1
  * Text Domain: send-everything-cf7
  * Domain Path: languages
