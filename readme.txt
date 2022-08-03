@@ -2,12 +2,16 @@
 
 Contributors:      salzano
 Tested up to:      6.0.1
-Stable tag:        1.1.0
+Stable tag:        1.1.1
 License:           GPL-2.0
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
 
 == Changelog ==
+
+= 1.1.1 =
+* [Added] Adds a screenshot
+* [Fixed] Stops backslashes from appearing before apostrophes
 
 = 1.1.0 =
 * [Added] Populates mail tab message body with `[everything]` during Add New form
