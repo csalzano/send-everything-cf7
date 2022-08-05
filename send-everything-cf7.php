@@ -106,9 +106,7 @@ if( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) )
 			$post_data = $submission->get_posted_data();
 			//Discard some fields
 			foreach ( $post_data as $k => $v ) {
-				if ( $k === '_wpnonce'
-					|| $k === '_wp_http_referer'
-					|| $k === 'h-captcha-response'
+				if ( $k === 'h-captcha-response'
 					|| $k === 'g-recaptcha-response' )
 				{
 					unset( $post_data["{$k}"] );
