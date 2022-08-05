@@ -102,12 +102,11 @@ if( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) )
 			//Allow HTML in emails
 			add_filter( 'wp_mail_content_type', array( $this, 'html_mail_content_type' ) );
 
-			//We are going to edit the array, so make a copy of $_POST
-			$post_data = $_POST;
+			$submission = WPCF7_Submission::get_instance();
+			$post_data = $submission->get_posted_data();
 			//Discard some fields
 			foreach ( $post_data as $k => $v ) {
-				if ( ( 6 <= strlen( $k ) && substr( $k, 0, 6 ) == '_wpcf7' )
-					|| $k === '_wpnonce'
+				if ( $k === '_wpnonce'
 					|| $k === '_wp_http_referer'
 					|| $k === 'h-captcha-response'
 					|| $k === 'g-recaptcha-response' )
@@ -135,7 +134,6 @@ if( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) )
 			) );
 
 			//Add the fields
-			$submission = WPCF7_Submission::get_instance();
 			foreach ( $post_data as $k => $v ) {
 
 				// Remove dupe content. The Hidden and Values are both sent.
