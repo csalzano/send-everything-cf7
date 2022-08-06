@@ -5,6 +5,21 @@ Tested up to:      6.0.1
 Stable tag:        1.1.2
 License:           GPL-2.0
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
+Tags:              contact form 7, send all, email
+
+WordPress plugin. Extension for Contact Form 7. Adds a mail-tag `[everything]` that sends all fields in the message body.
+
+
+== Description ==
+
+= Features =
+
+* Provides `[everything]` mail tag for great-looking, send-everything emails
+  * Includes all fields in emails except CAPTCHA and spam honeypot fields
+  * Formats values and submission meta into tables
+  * Added automatically to forms with blank "Message body" fields
+* Populates mail tab message body with `[everything]` during Add New form
+* Adds a `[submit]` button to any form missing one
 
 
 == Changelog ==
