@@ -2,7 +2,7 @@
 
 Contributors:      salzano
 Tested up to:      6.0.1
-Stable tag:        1.1.2
+Stable tag:        1.1.3
 License:           GPL-2.0
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 Tags:              contact form 7, send all, email
@@ -23,6 +23,9 @@ WordPress plugin. Extension for Contact Form 7. Adds a mail-tag `[everything]` t
 
 
 == Changelog ==
+
+= 1.1.3 = 
+* [Added] Adds feature list to readme.txt
 
 = 1.1.2 =
 * [Changed] Uses the form submission object to access fields rather than looping over $_POST
