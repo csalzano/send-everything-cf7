@@ -7,7 +7,7 @@ defined( 'ABSPATH' ) || exit;
  * Description: Provides [everything] mail tag for great-looking, send-everything emails
  * Author: Breakfast Co
  * Author URI: https://breakfastco.xyz
- * Version: 1.1.3
+ * Version: 1.1.4
  * Text Domain: send-everything-cf7
  * Domain Path: languages
  * License: GPLv2 or later
