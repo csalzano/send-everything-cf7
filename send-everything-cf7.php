@@ -99,6 +99,11 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 		 * @return void
 		 */
 		public function edit_mail_components( $components ) {
+			// Does this message body contain the [everything] mail tag?
+			if ( ! str_contains( $components['body'] ?? '', '[' . self::MAIL_TAG . ']' ) ) {
+				// No.
+				return $components;
+			}
 
 			// Allow HTML in emails.
 			add_filter( 'wp_mail_content_type', array( $this, 'html_mail_content_type' ) );
