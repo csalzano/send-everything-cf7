@@ -1,8 +1,8 @@
 === Send Everything for Contact Form 7 ===
 
 Contributors:      salzano
-Tested up to:      6.3.0
-Stable tag:        1.1.4
+Tested up to:      6.4.2
+Stable tag:        1.1.5
 License:           GPL-2.0
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 Tags:              contact form 7, send all, email
@@ -24,6 +24,11 @@ WordPress plugin. Extension for Contact Form 7. Adds a mail-tag `[everything]` t
 
 == Changelog ==
 
+= 1.1.5 =
+* [Fixed] Bug fix. Do not enable HTML for emails that do not contain the [everything] mail tag.
+* [Changed] Updates banner art.
+* [Changed] Changes tested up to version to 6.4.2.
+
 = 1.1.4 =
 * [Changed] Changes tested up to version to 6.3.0.
 
@@ -42,3 +47,9 @@ WordPress plugin. Extension for Contact Form 7. Adds a mail-tag `[everything]` t
 
 = 1.0.0 = 
 * First public release
+
+== Upgrade Notice ==
+
+= 1.1.5 =
+
+Bug fix. Do not enable HTML for emails that do not contain the [everything] mail tag. Updates banner art. Changes tested up to version to 6.4.2.
