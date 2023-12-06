@@ -1,6 +1,4 @@
 <?php
-defined( 'ABSPATH' ) || exit;
-
 /**
  * Plugin Name: Send Everything for Contact Form 7
  * Plugin URI: https://breakfastco.xyz/send-everything-for-contact-form-7/
@@ -14,6 +12,8 @@ defined( 'ABSPATH' ) || exit;
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  */
 
+defined( 'ABSPATH' ) || exit;
+
 if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 	/**
 	 * Send_Everything_For_Contact_Form_7
@@ -23,7 +23,7 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 		const MAIL_TAG = 'everything';
 
 		/**
-		 * add_hooks
+		 * Adds hooks that power the plugins features.
 		 *
 		 * @return void
 		 */
@@ -112,8 +112,8 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 			$post_data  = $submission->get_posted_data();
 			// Discard some fields.
 			foreach ( $post_data as $k => $v ) {
-				if ( $k === 'h-captcha-response'
-					|| $k === 'g-recaptcha-response' ) {
+				if ( 'h-captcha-response' === $k
+					|| 'g-recaptcha-response' === $k ) {
 					unset( $post_data[ "{$k}" ] );
 				}
 			}
@@ -153,7 +153,7 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 				}
 
 				// Is this an ignored form-tag type?
-				if ( in_array( $this->get_form_tag( $submission, $k ), $ignored_form_tags ) ) {
+				if ( in_array( $this->get_form_tag( $submission, $k ), $ignored_form_tags, true ) ) {
 					continue;
 				}
 
@@ -223,7 +223,7 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 		 *
 		 * @param  mixed $submission
 		 * @param  mixed $tag
-		 * @return void
+		 * @return string
 		 */
 		protected function get_form_tag( $submission, $tag ) {
 			if ( is_callable( array( $submission, 'get_contact_form' ) )
