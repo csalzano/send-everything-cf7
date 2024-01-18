@@ -38,7 +38,7 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 			add_filter( 'wpcf7_mail_components', array( $this, 'edit_mail_components' ) );
 			add_filter( 'wpcf7_collect_mail_tags', array( $this, 'add_tag' ) );
 			add_filter( 'wpcf7_contact_form_properties', array( $this, 'add_submit_button' ), 10, 2 );
-			add_filter( 'wpcf7_contact_form_default_pack', array( $this, 'change_default_mail_templates' ), 10, 2 );
+			add_filter( 'wpcf7_contact_form_default_pack', array( $this, 'change_default_mail_templates' ) );
 		}
 
 		/**
@@ -84,11 +84,10 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 		 * Changes the mail tab bodies to contain our tag only as forms are
 		 * created.
 		 *
-		 * @param  WPCF7_ContactForm $contact_form
-		 * @param  array             $args
+		 * @param  WPCF7_ContactForm $contact_form Contact form object.
 		 * @return WPCF7_ContactForm
 		 */
-		public function change_default_mail_templates( $contact_form, $args ) {
+		public function change_default_mail_templates( $contact_form ) {
 			$properties = $contact_form->get_properties();
 			if ( $properties['mail'] === WPCF7_ContactFormTemplate::mail() ) {
 				$properties['mail']['body'] = '[' . self::MAIL_TAG . ']';
