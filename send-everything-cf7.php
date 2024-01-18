@@ -44,8 +44,8 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 		/**
 		 * Adds [submit] form tags to forms that do not have them.
 		 *
-		 * @param  array             $properties
-		 * @param  WPCF7_ContactForm $form
+		 * @param  array             $properties Form properties.
+		 * @param  WPCF7_ContactForm $form Contact form object.
 		 * @return array
 		 */
 		public function add_submit_button( $properties, $form ) {
@@ -72,7 +72,7 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 		/**
 		 * Adds an [everything] mail tag.
 		 *
-		 * @param  array $mailtags
+		 * @param  array $mailtags Array of mail tag name strings.
 		 * @return array
 		 */
 		public function add_tag( $mailtags = array() ) {
@@ -81,7 +81,8 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 		}
 
 		/**
-		 * change_default_mail_templates
+		 * Changes the mail tab bodies to contain our tag only as forms are
+		 * created.
 		 *
 		 * @param  WPCF7_ContactForm $contact_form
 		 * @param  array             $args
@@ -100,10 +101,10 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 		}
 
 		/**
-		 * edit_mail_components
+		 * Replaces our [everything] mail tag in the body of emails.
 		 *
-		 * @param  mixed $components
-		 * @return void
+		 * @param  array $components Array of email components with keys 'subject', 'sender', 'body', 'recipient', 'additional_headers', and 'attachments'.
+		 * @return array
 		 */
 		public function edit_mail_components( $components ) {
 			// Does this message body contain the [everything] mail tag?
