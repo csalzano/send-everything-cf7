@@ -31,6 +31,10 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 		 * @return void
 		 */
 		public function add_hooks() {
+			// Add compatibility with language packs.
+			add_action( 'init', array( $this, 'load_textdomain' ) );
+
+			// Add all the plugin's features.
 			add_filter( 'wpcf7_mail_components', array( $this, 'edit_mail_components' ) );
 			add_filter( 'wpcf7_collect_mail_tags', array( $this, 'add_tag' ) );
 			add_filter( 'wpcf7_contact_form_properties', array( $this, 'add_submit_button' ), 10, 2 );
@@ -249,6 +253,15 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 		 */
 		public static function html_mail_content_type( $type ) {
 			return 'text/html';
+		}
+
+		/**
+		 * Loads translated strings.
+		 *
+		 * @return void
+		 */
+		public function load_textdomain() {
+			load_plugin_textdomain( 'send-everything-cf7', false, __DIR__ . '/languages' );
 		}
 
 		/**
