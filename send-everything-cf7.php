@@ -89,10 +89,10 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 		 */
 		public function change_default_mail_templates( $contact_form ) {
 			$properties = $contact_form->get_properties();
-			if ( $properties['mail'] === WPCF7_ContactFormTemplate::mail() ) {
+			if ( WPCF7_ContactFormTemplate::mail() === $properties['mail'] ) {
 				$properties['mail']['body'] = '[' . self::MAIL_TAG . ']';
 			}
-			if ( $properties['mail_2'] === WPCF7_ContactFormTemplate::mail_2() ) {
+			if ( WPCF7_ContactFormTemplate::mail_2() === $properties['mail_2'] ) {
 				$properties['mail_2']['body'] = '[' . self::MAIL_TAG . ']';
 			}
 			$contact_form->set_properties( $properties );
