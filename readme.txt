@@ -2,7 +2,7 @@
 
 Contributors:      salzano
 Tested up to:      6.4.2
-Stable tag:        1.1.5
+Stable tag:        1.1.6
 License:           GPL-2.0
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 Tags:              contact form, contact form 7, email
@@ -23,6 +23,9 @@ WordPress plugin. Extension for Contact Form 7. Adds a mail-tag `[everything]` t
 
 
 == Changelog ==
+
+= 1.1.6 =
+* [Fixed] Adds compatibility with language packs.
 
 = 1.1.5 =
 * [Fixed] Bug fix. Do not enable HTML for emails that do not contain the [everything] mail tag.
@@ -50,6 +53,8 @@ WordPress plugin. Extension for Contact Form 7. Adds a mail-tag `[everything]` t
 
 == Upgrade Notice ==
 
-= 1.1.5 =
+= 1.1.6 =
+Adds compatibility with language packs.
 
+= 1.1.5 =
 Bug fix. Do not enable HTML for emails that do not contain the [everything] mail tag. Updates banner art. Changes tested up to version to 6.4.2.
