@@ -343,22 +343,19 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 				'link'    => 'https://breakfastco.xyz/send-everything-for-contact-form-7/',
 			);
 			// Does either mail tab contain our mail tag? Is HTML enabled?
-			if ( str_contains( $properties['mail']['body'] ?? '', '[' . self::MAIL_TAG . ']' )
-				&& ! $properties['mail']['use_html'] ) {
-				$validator->add_error(
-					'mail.body',
-					'need_html',
-					$error_detail
-				);
-			}
-			// Same check for mail_2.
-			if ( str_contains( $properties['mail_2']['body'] ?? '', '[' . self::MAIL_TAG . ']' )
-				&& ! $properties['mail_2']['use_html'] ) {
-				$validator->add_error(
-					'mail_2.body',
-					'need_html',
-					$error_detail
-				);
+			$tabs = array(
+				'mail',
+				'mail_2',
+			);
+			foreach ( $tabs as $tab ) {
+				if ( str_contains( $properties[ $tab ]['body'] ?? '', '[' . self::MAIL_TAG . ']' )
+					&& ! $properties[ $tab ]['use_html'] ) {
+					$validator->add_error(
+						$tab . '.body',
+						'need_html',
+						$error_detail
+					);
+				}
 			}
 			return $validator;
 		}
