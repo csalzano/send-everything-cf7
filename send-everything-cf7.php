@@ -34,6 +34,12 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 			// Add compatibility with language packs.
 			add_action( 'init', array( $this, 'load_textdomain' ) );
 
+			// Help users enable HTML when using our mail tag.
+			add_action( 'wpcf7_config_validator_validate', array( $this, 'validate_mail_tabs' ) );
+
+			// Add a validation error type to the list of recognized errors.
+			add_filter( 'wpcf7_config_validator_available_error_codes', array( $this, 'validate_add_error' ) );
+
 			// Add all the plugin's features.
 			add_filter( 'wpcf7_mail_components', array( $this, 'edit_mail_components' ) );
 			add_filter( 'wpcf7_collect_mail_tags', array( $this, 'add_tag' ) );
@@ -90,10 +96,12 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 		public function change_default_mail_templates( $contact_form ) {
 			$properties = $contact_form->get_properties();
 			if ( WPCF7_ContactFormTemplate::mail() === $properties['mail'] ) {
-				$properties['mail']['body'] = '[' . self::MAIL_TAG . ']';
+				$properties['mail']['body']     = '[' . self::MAIL_TAG . ']';
+				$properties['mail']['use_html'] = true;
 			}
 			if ( WPCF7_ContactFormTemplate::mail_2() === $properties['mail_2'] ) {
-				$properties['mail_2']['body'] = '[' . self::MAIL_TAG . ']';
+				$properties['mail_2']['body']     = '[' . self::MAIL_TAG . ']';
+				$properties['mail_2']['use_html'] = true;
 			}
 			$contact_form->set_properties( $properties );
 			return $contact_form;
@@ -112,8 +120,11 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 				return $components;
 			}
 
-			// Allow HTML in emails.
-			add_filter( 'wp_mail_content_type', array( $this, 'html_mail_content_type' ) );
+			// Is HTML enabled?
+			if ( ! $components['use_html'] ) {
+				// Allow HTML in emails.
+				add_filter( 'wp_mail_content_type', array( $this, 'html_mail_content_type' ) );
+			}
 
 			$submission = WPCF7_Submission::get_instance();
 			$post_data  = $submission->get_posted_data();
@@ -303,6 +314,53 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 				$value,
 				$css_table_cell
 			);
+		}
+
+		/**
+		 * Add a validation error type to the list of recognized errors.
+		 *
+		 * @param  array $errors An array of error slug strings.
+		 * @return array
+		 */
+		public function validate_add_error( $errors ) {
+			$errors[] = 'need_html';
+			return $errors;
+		}
+
+		/**
+		 * Help users enable HTML when using our mail tag. If a mail tab
+		 * contains the everything mail tab but the "Use HTML content type"
+		 * checkbox is not checked, add a configuration error.
+		 *
+		 * @param  WPCF7_ConfigValidator $validator Configuration validator.
+		 * @return WPCF7_ConfigValidator
+		 */
+		public function validate_mail_tabs( $validator ) {
+			$form         = $validator->contact_form();
+			$properties   = $form->get_properties();
+			$error_detail = array(
+				'message' => __( 'The [everything] mail tag requires HTML. Check "Use HTML content type" below.', 'send-everything-cf7' ),
+				'link'    => 'https://breakfastco.xyz/send-everything-for-contact-form-7/',
+			);
+			// Does either mail tab contain our mail tag? Is HTML enabled?
+			if ( str_contains( $properties['mail']['body'] ?? '', '[' . self::MAIL_TAG . ']' )
+				&& ! $properties['mail']['use_html'] ) {
+				$validator->add_error(
+					'mail.body',
+					'need_html',
+					$error_detail
+				);
+			}
+			// Same check for mail_2.
+			if ( str_contains( $properties['mail_2']['body'] ?? '', '[' . self::MAIL_TAG . ']' )
+				&& ! $properties['mail_2']['use_html'] ) {
+				$validator->add_error(
+					'mail_2.body',
+					'need_html',
+					$error_detail
+				);
+			}
+			return $validator;
 		}
 	}
 	$send_everything_cf7_002390402384 = new Send_Everything_For_Contact_Form_7();
