@@ -121,7 +121,7 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 			}
 
 			// Is HTML enabled?
-			if ( ! $components['use_html'] ) {
+			if ( ! isset( $components['use_html'] ) || ! $components['use_html'] ) {
 				// Allow HTML in emails.
 				add_filter( 'wp_mail_content_type', array( $this, 'html_mail_content_type' ) );
 			}
