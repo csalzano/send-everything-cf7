@@ -109,7 +109,7 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 					preg_match_all( $pattern_starts, $properties[ $tab ]['body'], $matches_starts, PREG_OFFSET_CAPTURE );
 					preg_match_all( $pattern_ends, $properties[ $tab ]['body'], $matches_ends, PREG_OFFSET_CAPTURE );
 
-					if ( 1 === count( $matches_starts ) && $matches_starts[0] === array() ) {
+					if ( 1 === count( $matches_starts ) && array() === $matches_starts[0] ) {
 						// No matches.
 						continue;
 					}
