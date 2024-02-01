@@ -122,6 +122,8 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 						preg_match_all( $pattern_starts, $properties[ $tab ]['body'], $matches_starts, PREG_OFFSET_CAPTURE );
 						preg_match_all( $pattern_ends, $properties[ $tab ]['body'], $matches_ends, PREG_OFFSET_CAPTURE );
 					} while ( array() !== $matches_starts[0] );
+					// Make sure the Use HTML content type setting is checked.
+					$properties[ $tab ]['use_html'] = true;
 				}
 
 				$form->set_properties( $properties );
@@ -222,13 +224,13 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 				$properties = $form->get_properties();
 				// Does Mail or Mail 2 have the everything mail tag?
 				$everything_html = self::get_everything_html( $form );
-				if ( str_contains( $properties['mail']['body'] ?? '', '[' . self::MAIL_TAG . ']' ) ) {
-					// Yes, replace it with HTML.
-					$properties['mail']['body'] = str_replace( '[' . self::MAIL_TAG . ']', $everything_html, str_replace( '<p>[' . self::MAIL_TAG . ']</p>', $everything_html, $properties['mail']['body'] ) );
-				}
-				if ( str_contains( $properties['mail_2']['body'] ?? '', '[' . self::MAIL_TAG . ']' ) ) {
-					// Yes, replace it with HTML.
-					$properties['mail_2']['body'] = str_replace( '[' . self::MAIL_TAG . ']', $everything_html, str_replace( '<p>[' . self::MAIL_TAG . ']</p>', $everything_html, $properties['mail_2']['body'] ) );
+				foreach ( array( 'mail', 'mail_2' ) as $tab ) {
+					if ( str_contains( $properties[ $tab ]['body'] ?? '', '[' . self::MAIL_TAG . ']' ) ) {
+						// Yes, replace it with HTML.
+						$properties[ $tab ]['body'] = str_replace( '[' . self::MAIL_TAG . ']', $everything_html, str_replace( '<p>[' . self::MAIL_TAG . ']</p>', $everything_html, $properties[ $tab ]['body'] ) );
+						// Make sure the Use HTML content type setting is checked.
+						$properties[ $tab ]['use_html'] = true;
+					}
 				}
 				$form->set_properties( $properties );
 				$form->save();
@@ -267,10 +269,20 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 			return $components;
 		}
 
+		/**
+		 * Returns HTML that begins what replaces the everything mail tag.
+		 *
+		 * @return string
+		 */
 		protected static function html_prefix() {
 			return '<div class="send-everything-cf7">';
 		}
 
+		/**
+		 * Returns HTML that ends what replaces the everything mail tag.
+		 *
+		 * @return string
+		 */
 		protected static function html_suffix() {
 			return '<span class="send-everything-cf7"></span></div>';
 		}
