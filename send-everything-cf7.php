@@ -5,7 +5,7 @@
  * Description: Provides [everything] mail tag for great-looking, send-everything emails
  * Author: Breakfast
  * Author URI: https://breakfastco.xyz
- * Version: 1.1.6
+ * Version: 1.2.0
  * Text Domain: send-everything-cf7
  * Domain Path: languages
  * License: GPLv2 or later
