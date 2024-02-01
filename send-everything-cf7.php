@@ -40,11 +40,93 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 			// Add a validation error type to the list of recognized errors.
 			add_filter( 'wpcf7_config_validator_available_error_codes', array( $this, 'validate_add_error' ) );
 
-			// Add all the plugin's features.
+			// Replaces the everything mail tag with HTML when email messages are prepared.
 			add_filter( 'wpcf7_mail_components', array( $this, 'edit_mail_components' ) );
+
+			// Adds the everything mail tag to the list of recognized mail tags.
 			add_filter( 'wpcf7_collect_mail_tags', array( $this, 'add_tag' ) );
+
+			// Adds a submit button to forms missing them.
 			add_filter( 'wpcf7_contact_form_properties', array( $this, 'add_submit_button' ), 10, 2 );
+
+			/**
+			 * Changes the body field of mail tabs to contain only the
+			 * everything mail tag when a new form is created.
+			 */
 			add_filter( 'wpcf7_contact_form_default_pack', array( $this, 'change_default_mail_templates' ) );
+
+			/**
+			 * When the plugin is deactivated, do not allow emails using the
+			 * everything mail tag to break. Replaces the tag in all mail tabs
+			 * it appears with HTML that will produce a similar email body.
+			 */
+			register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
+
+			/**
+			 * When the plugin is activated, restore the everything mail tag to
+			 * mail tabs that contained the tag previously.
+			 */
+			register_activation_hook( __FILE__, array( $this, 'activate' ) );
+		}
+
+		/**
+		 * Activation hook callback. Restores the everything mail tag to mail
+		 * tabs that contained the tag when the plugin was deactivated.
+		 *
+		 * @return void
+		 */
+		public static function activate() {
+			if ( ! class_exists( 'WPCF7_ContactForm' ) ) {
+				return;
+			}
+
+			// phpcs:ignore WordPress.WP.Capabilities.Unknown
+			if ( ! current_user_can( 'wpcf7_edit_contact_forms' ) ) {
+				// Sorry, you've got the capability to activate plugins but not edit forms.
+				return;
+			}
+
+			// Get all forms.
+			$forms = WPCF7_ContactForm::find(
+				array(
+					'per_page' => -1,
+				)
+			);
+
+			$pattern_starts = '/' . preg_quote( self::html_prefix(), '/' ) . '/';
+			$pattern_ends   = '/' . str_replace( '\<\/span\>\<', '\<\/span\>\r?\n\<', preg_quote( self::html_suffix(), '/' ) ) . '/';
+
+			foreach ( $forms as $form ) {
+				// phpcs:ignore WordPress.WP.Capabilities.Unknown
+				if ( ! current_user_can( 'wpcf7_edit_contact_form', $form->id() ) ) {
+					// The user cannot edit this form. Sorry.
+					continue;
+				}
+				$properties = $form->get_properties();
+
+				// Does Mail or Mail 2 have HTML generated during deactivation?
+				foreach ( array( 'mail', 'mail_2' ) as $tab ) {
+					preg_match_all( $pattern_starts, $properties[ $tab ]['body'], $matches_starts, PREG_OFFSET_CAPTURE );
+					preg_match_all( $pattern_ends, $properties[ $tab ]['body'], $matches_ends, PREG_OFFSET_CAPTURE );
+
+					if ( 1 === count( $matches_starts ) && $matches_starts[0] === array() ) {
+						// No matches.
+						continue;
+					}
+
+					// Yes. Replace the HTML with the everything mail tag.
+					do {
+						$match                      = $matches_starts[0][0];
+						$properties[ $tab ]['body'] = substr_replace( $properties[ $tab ]['body'], '[' . self::MAIL_TAG . ']', $match[1], $matches_ends[0][0][1] - $match[1] + strlen( $matches_ends[0][0][0] ) );
+
+						preg_match_all( $pattern_starts, $properties[ $tab ]['body'], $matches_starts, PREG_OFFSET_CAPTURE );
+						preg_match_all( $pattern_ends, $properties[ $tab ]['body'], $matches_ends, PREG_OFFSET_CAPTURE );
+					} while ( array() !== $matches_starts[0] );
+				}
+
+				$form->set_properties( $properties );
+				$form->save();
+			}
 		}
 
 		/**
@@ -108,6 +190,52 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 		}
 
 		/**
+		 * Deactivation hook callback. Converts all mail tabs that contain the
+		 * everything mail tag to deliver the same email without this plugin.
+		 *
+		 * @return void
+		 */
+		public static function deactivate() {
+			if ( ! class_exists( 'WPCF7_ContactForm' ) ) {
+				return;
+			}
+
+			// phpcs:ignore WordPress.WP.Capabilities.Unknown
+			if ( ! current_user_can( 'wpcf7_edit_contact_forms' ) ) {
+				// Sorry, you've got the capability to deactivate plugins but not edit forms.
+				return;
+			}
+
+			// Get all forms.
+			$forms = WPCF7_ContactForm::find(
+				array(
+					'per_page' => -1,
+				)
+			);
+
+			foreach ( $forms as $form ) {
+				// phpcs:ignore WordPress.WP.Capabilities.Unknown
+				if ( ! current_user_can( 'wpcf7_edit_contact_form', $form->id() ) ) {
+					// The user cannot edit this form. Sorry.
+					continue;
+				}
+				$properties = $form->get_properties();
+				// Does Mail or Mail 2 have the everything mail tag?
+				$everything_html = self::get_everything_html( $form );
+				if ( str_contains( $properties['mail']['body'] ?? '', '[' . self::MAIL_TAG . ']' ) ) {
+					// Yes, replace it with HTML.
+					$properties['mail']['body'] = str_replace( '[' . self::MAIL_TAG . ']', $everything_html, str_replace( '<p>[' . self::MAIL_TAG . ']</p>', $everything_html, $properties['mail']['body'] ) );
+				}
+				if ( str_contains( $properties['mail_2']['body'] ?? '', '[' . self::MAIL_TAG . ']' ) ) {
+					// Yes, replace it with HTML.
+					$properties['mail_2']['body'] = str_replace( '[' . self::MAIL_TAG . ']', $everything_html, str_replace( '<p>[' . self::MAIL_TAG . ']</p>', $everything_html, $properties['mail_2']['body'] ) );
+				}
+				$form->set_properties( $properties );
+				$form->save();
+			}
+		}
+
+		/**
 		 * Replaces our [everything] mail tag in the body of emails.
 		 *
 		 * @param  array $components Array of email components with keys 'subject', 'sender', 'body', 'recipient', 'additional_headers', and 'attachments'.
@@ -126,20 +254,39 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 				add_filter( 'wp_mail_content_type', array( $this, 'html_mail_content_type' ) );
 			}
 
-			$submission = WPCF7_Submission::get_instance();
-			$post_data  = $submission->get_posted_data();
-			// Discard some fields.
-			foreach ( $post_data as $k => $v ) {
-				if ( 'h-captcha-response' === $k
-					|| 'g-recaptcha-response' === $k ) {
-					unset( $post_data[ "{$k}" ] );
-				}
+			$everything_html = self::get_everything_html();
+
+			// Is the message body empty?
+			if ( '' === $components['body']
+				&& true === apply_filters( 'wpcf7_send_everything_fill_empty_message_body', true ) ) {
+				// Prevent a blank mail template from sending empty emails.
+				$components['body'] = '[' . self::MAIL_TAG . ']';
 			}
 
+			$components['body'] = str_replace( '[' . self::MAIL_TAG . ']', $everything_html, str_replace( '<p>[' . self::MAIL_TAG . ']</p>', $everything_html, $components['body'] ) );
+			return $components;
+		}
+
+		protected static function html_prefix() {
+			return '<div class="send-everything-cf7">';
+		}
+
+		protected static function html_suffix() {
+			return '<span class="send-everything-cf7"></span></div>';
+		}
+
+		/**
+		 * Creates HTML that replaces the everything mail tag.
+		 *
+		 * @param  WPCF7_ContactForm $form Contact form object. If not provided, the form will be extracted from the current submission.
+		 * @return string
+		 */
+		protected static function get_everything_html( $form = null ) {
 			$css_font = apply_filters( 'wpcf7_send_everything_css_font', 'font-family:Helvetica,sans-serif;' );
 
-			// Start building the email body HTML in $postbody.
-			$postbody = apply_filters(
+			// Start building the email body HTML in $html.
+			$html  = self::html_prefix();
+			$html .= apply_filters(
 				'wpcf7_send_everything_title',
 				"<h1 style='{$css_font}'>" . __( 'Submitted Values', 'send-everything-cf7' ) . '</h1>'
 			);
@@ -148,7 +295,34 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 				'wpcf7_send_everything_table_open',
 				"<table style='{$css_font}border:2px solid #f8f8f8;border-collapse:collapse;background:#fff;'>"
 			);
-			$postbody       .= $table_open_html;
+			$html           .= $table_open_html;
+
+			// Holds keys & values of the table rows.
+			$post_data = array();
+			// Holds the current submission.
+			$submission = null;
+
+			// Add the fields. Was a form passed?
+			if ( null === $form ) {
+				// No, use the current submission to get $_POST data.
+				$submission = WPCF7_Submission::get_instance();
+				$post_data  = $submission->get_posted_data();
+				// Discard some fields.
+				foreach ( $post_data as $k => $v ) {
+					if ( 'h-captcha-response' === $k
+						|| 'g-recaptcha-response' === $k ) {
+						unset( $post_data[ "{$k}" ] );
+					}
+				}
+			} else {
+				// Yes, a form was passed. Extract all the tags.
+				foreach ( array_column( $form->scan_form_tags(), 'name' ) as $name ) {
+					if ( '' === $name ) {
+						continue;
+					}
+					$post_data[ $name ] = '[' . $name . ']';
+				}
+			}
 
 			$ignored_form_tags = apply_filters(
 				'wpcf7_send_everything_ignored_form_tags',
@@ -157,7 +331,6 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 				)
 			);
 
-			// Add the fields.
 			foreach ( $post_data as $k => $v ) {
 
 				// Remove dupe content. The Hidden and Values are both sent.
@@ -165,89 +338,108 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 					continue;
 				}
 
-				// If there's no value for the field, don't send it.
-				if ( empty( $v ) && false === apply_filters( 'wpcf7_send_everything_empty_fields', true ) ) {
+				// If we're processing the current submission and there's no value for the field, don't send it.
+				if ( null === $form && empty( $v ) && false === apply_filters( 'wpcf7_send_everything_empty_fields', true ) ) {
 					continue;
 				}
 
 				// Is this an ignored form-tag type?
-				if ( in_array( $this->get_form_tag( $submission, $k ), $ignored_form_tags, true ) ) {
+				if ( in_array( self::get_form_tag_basetype( $submission, $k ), $ignored_form_tags, true ) ) {
 					continue;
 				}
 
-				$postbody .= $this->prepare_table_row_value( $k, $v );
+				$html .= self::prepare_table_row_value( $k, $v );
 			}
 
-			$postbody .= apply_filters( 'wpcf7_send_everything_table_close', '</table>' );
-
-			$postbody .= apply_filters(
+			$html .= apply_filters( 'wpcf7_send_everything_table_close', '</table>' );
+			$html .= apply_filters(
 				'wpcf7_send_everything_title_meta',
 				"<h2 style='{$css_font}'>" . __( 'Submission Meta', 'send-everything-cf7' ) . '</h2>'
 			);
 
-			$postbody .= $table_open_html;
+			$html .= $table_open_html;
 
 			// Add some meta data.
 			if ( is_callable( array( $submission, 'get_contact_form' ) ) ) {
 				$form = $submission->get_contact_form();
-				// Form title.
-				if ( is_callable( array( $form, 'title' ) ) ) {
-					$postbody .= $this->prepare_table_row_value( 'form_title', $form->title() );
-				}
-				// Form ID.
-				if ( is_callable( array( $form, 'id' ) ) ) {
-					$postbody .= $this->prepare_table_row_value( 'form_id', $form->id() );
-				}
+			}
+
+			// Form title.
+			if ( is_callable( array( $form, 'title' ) ) ) {
+				$html .= self::prepare_table_row_value( 'form_title', $form->title() );
+			}
+			// Form ID.
+			if ( is_callable( array( $form, 'id' ) ) ) {
+				$html .= self::prepare_table_row_value( 'form_id', $form->id() );
 			}
 
 			if ( is_callable( array( $submission, 'get_meta' ) ) ) {
 				// Form URL.
-				if ( $url = $submission->get_meta( 'url' ) ) {
-					$postbody .= $this->prepare_table_row_value( 'form_url', esc_url( $url ) );
+				$url = $submission->get_meta( 'url' );
+				if ( $url ) {
+					$html .= self::prepare_table_row_value( 'form_url', esc_url( $url ) );
 				}
 				// User name.
-				if ( $user_id = (int) $submission->get_meta( 'current_user_id' ) ) {
+				$user_id = (int) $submission->get_meta( 'current_user_id' );
+				if ( $user_id ) {
 					$user = new WP_User( $user_id );
 					if ( $user->has_prop( 'user_login' ) ) {
-						$postbody .= $this->prepare_table_row_value( 'user_login', $user->get( 'user_login' ) );
+						$html .= self::prepare_table_row_value( 'user_login', $user->get( 'user_login' ) );
 					}
 				}
 
-				if ( $timestamp = $submission->get_meta( 'timestamp' ) ) {
+				// Time & date.
+				$timestamp = $submission->get_meta( 'timestamp' );
+				if ( $timestamp ) {
 					// Date.
-					$postbody .= $this->prepare_table_row_value( 'date', wp_date( get_option( 'date_format' ), $timestamp ) );
+					$html .= self::prepare_table_row_value( 'date', wp_date( get_option( 'date_format' ), $timestamp ) );
 
 					// Time.
-					$postbody .= $this->prepare_table_row_value( 'time', wp_date( get_option( 'time_format' ), $timestamp ) );
+					$html .= self::prepare_table_row_value( 'time', wp_date( get_option( 'time_format' ), $timestamp ) );
 				}
+			} else {
+				// Form URL.
+				$html .= self::prepare_table_row_value( 'form_url', '[_url]' );
+				// User name.
+				$html .= self::prepare_table_row_value( 'user_login', '[_user_login]' );
+				// Date.
+				$html .= self::prepare_table_row_value( 'date', '[_date]' );
+				// Time.
+				$html .= self::prepare_table_row_value( 'time', '[_time]' );
 			}
 
-			$postbody .= apply_filters( 'wpcf7_send_everything_table_close', '</table>' );
+			$html .= apply_filters( 'wpcf7_send_everything_table_close', '</table>' )
+				. self::html_suffix();
 
-			// Is the message body empty?
-			if ( '' === $components['body']
-				&& true === apply_filters( 'wpcf7_send_everything_fill_empty_message_body', true ) ) {
-				// Prevent a blank mail template from sending empty emails.
-				$components['body'] = '[everything]';
+			// If we passed a form, pretty print HTML with tidy if it is available.
+			if ( null !== $form && function_exists( 'tidy_parse_string' ) ) {
+				$html = tidy_parse_string(
+					$html,
+					array(
+						'drop-empty-elements' => false,
+						'indent'              => true,
+						'show-body-only'      => true,
+					),
+					'utf8'
+				);
 			}
 
-			$components['body'] = str_replace( '[' . self::MAIL_TAG . ']', $postbody, str_replace( '<p>[' . self::MAIL_TAG . ']</p>', $postbody, $components['body'] ) );
-
-			return $components;
+			return $html;
 		}
 
 		/**
-		 * get_form_tag
+		 * Given a tag name, find the form tag in the form object and return its
+		 * basetype.
 		 *
-		 * @param  mixed $submission
-		 * @param  mixed $tag
+		 * @param  WPCF7_Submission $submission Submission object.
+		 * @param  string           $tag Form tag name.
 		 * @return string
 		 */
-		protected function get_form_tag( $submission, $tag ) {
+		protected static function get_form_tag_basetype( $submission, $tag ) {
 			if ( is_callable( array( $submission, 'get_contact_form' ) )
 				&& is_callable( array( $submission->get_contact_form(), 'scan_form_tags' ) ) ) {
 				foreach ( $submission->get_contact_form()->scan_form_tags() as $form_tag ) {
-					if ( $form_tag->name != $tag ) {
+					if ( $form_tag->name !== $tag ) {
 						continue;
 					}
 					return $form_tag->basetype ?? '';
@@ -259,10 +451,9 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 		/**
 		 * Returns the string 'text/html'
 		 *
-		 * @param  string $type
 		 * @return string
 		 */
-		public static function html_mail_content_type( $type ) {
+		public static function html_mail_content_type() {
 			return 'text/html';
 		}
 
@@ -276,13 +467,13 @@ if ( ! class_exists( 'Send_Everything_For_Contact_Form_7' ) ) {
 		}
 
 		/**
-		 * prepare_table_row_value
+		 * Creates an HTML table row string containing the given label and value.
 		 *
-		 * @param  mixed $label
-		 * @param  mixed $value
-		 * @return void
+		 * @param  string $label Field name.
+		 * @param  string $value Field value.
+		 * @return string
 		 */
-		protected function prepare_table_row_value( $label, $value ) {
+		protected static function prepare_table_row_value( $label, $value ) {
 			if ( is_array( $value ) ) {
 				$value = implode( ', ', $value );
 			}
