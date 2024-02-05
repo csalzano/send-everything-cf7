@@ -10,6 +10,7 @@ WordPress plugin. Extension for Contact Form 7. Adds a mail-tag <code>[everythin
   - Includes all fields in emails except CAPTCHA and spam honeypot fields
   - Formats values and submission meta into tables
   - Added automatically to forms with blank "Message body" fields
+  - Works even if the plugin is deactivated. [Learn More →](https://breakfastco.xyz/send-everything-for-contact-form-7/#deactivation)
 - Populates mail tab message body with `[everything]` during Add New form
 - Adds a `[submit]` button to any form missing one
 
