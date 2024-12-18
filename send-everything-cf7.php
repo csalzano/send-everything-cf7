@@ -10,9 +10,14 @@
  * Domain Path: /languages
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
+ * GitHub Plugin URI: csalzano/send-everything-cf7
+ * Primary Branch: main
  *
  * @package send-everything-cf7
  * @author Corey Salzano <csalzano@duck.com>
+ *
+ * Copyright © 2022, Corey Salzano.  All rights reserved.
+ * "Contact Form 7" is a trademark of Rock Lobster, LLC.
  */
 
 defined( 'ABSPATH' ) || exit;
