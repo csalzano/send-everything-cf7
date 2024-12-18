@@ -5,13 +5,15 @@
  * Description: Provides [everything] mail tag for great-looking, send-everything emails
  * Author: Breakfast
  * Author URI: https://breakfastco.xyz
- * Version: 1.2.0
+ * Version: 1.2.1
  * Text Domain: send-everything-cf7
  * Domain Path: /languages
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  * GitHub Plugin URI: csalzano/send-everything-cf7
  * Primary Branch: main
+ * Download URI: https://downloads.wordpress.org/plugin/send-everything-cf7.1.2.1.zip
+ * Download URI: https://breakfastco.xyz/wp-content/uploads/send-everything-cf7-v1.2.1.zip
  *
  * @package send-everything-cf7
  * @author Corey Salzano <csalzano@duck.com>

@@ -1,11 +1,11 @@
 === Send Everything for Contact Form 7 ===
 
-Contributors:      salzano
-Tested up to:      6.4.2
-Stable tag:        1.2.0
-License:           GPL-2.0
-License URI:       https://www.gnu.org/licenses/gpl-2.0.html
-Tags:              contact form, contact form 7, email
+Contributors: salzano
+Tested up to: 6.7.1
+Stable tag:   1.2.1
+License:      GPLv2
+License URI:  https://www.gnu.org/licenses/gpl-2.0.html
+Tags:         contact form, contact form 7, email
 
 WordPress plugin. Extension for Contact Form 7. Adds a mail-tag `[everything]` that sends all fields in the message body.
 
@@ -22,8 +22,21 @@ WordPress plugin. Extension for Contact Form 7. Adds a mail-tag `[everything]` t
 * Populates mail tab message body with `[everything]` during Add New form
 * Adds a `[submit]` button to any form missing one
 
+== Installation ==
+
+1. Upload the `send-everything-cf7` directory to the `/wp-content/plugins/` directory
+1. Activate the plugin through the 'Plugins' menu in WordPress
+
+### Downloads
+
+ * [https://downloads.wordpress.org/plugin/send-everything-cf7.1.2.1.zip](https://downloads.wordpress.org/plugin/send-everything-cf7.1.2.1.zip)
+ * [https://breakfastco.xyz/wp-content/uploads/send-everything-cf7-v1.2.1.zip](https://breakfastco.xyz/wp-content/uploads/send-everything-cf7-v1.2.1.zip)
 
 == Changelog ==
+
+= 1.2.1 =
+* [Fixed] Packages translation files with the plugin.
+* [Changed] Changes tested up to version to 6.7.1.
 
 = 1.2.0 =
 * [Added] Prevent emails from breaking when mail tabs contain the [everything] mail tag and this plugin is deactivated. Replaces the tag in all mail tabs it appears with HTML that will produce a similar email body.
@@ -58,6 +71,9 @@ WordPress plugin. Extension for Contact Form 7. Adds a mail-tag `[everything]` t
 * First public release
 
 == Upgrade Notice ==
+
+= 1.2.1 =
+Packages translation files with the plugin. Changes tested up to version to 6.7.1.
 
 = 1.2.0 =
 Prevent emails from breaking when mail tabs contain the [everything] mail tag and this plugin is deactivated. Replaces the tag in all mail tabs it appears with HTML that will produce a similar email body. Checks the "Use HTML content type" setting when new forms are created and mail tabs are populated with the [everything] mail tag. Adds a configuration error when the [everything] mail tag is detected in a mail tab body and the "Use HTML content type" box is not checked.
