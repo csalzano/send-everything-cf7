@@ -7,7 +7,7 @@
  * Author URI: https://breakfastco.xyz
  * Version: 1.2.0
  * Text Domain: send-everything-cf7
- * Domain Path: languages
+ * Domain Path: /languages
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
